@@ -8,4 +8,6 @@ Gem::Specification.new do |s|
     s.files       = ["lib/pod-pipeline.rb", "lib/pod-pipeline/scan.rb"]
     s.homepage    = 'https://rubygems.org/gems/pod-pipeline'
     s.license     = 'MIT'
+
+    s.executables << 'pod-pipeline'
 end
