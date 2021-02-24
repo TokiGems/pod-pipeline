@@ -1,8 +1,6 @@
 class Scan
     def all
-      pod
-      git
-      workspace
+      return pod+git+workspace
     end
   
     def pod
