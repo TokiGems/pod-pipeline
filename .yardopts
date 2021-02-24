@@ -1,1 +1,1 @@
---markup markdown --protected --charset=utf-8 lib
+--markup markdown --no-private --protected --charset=utf-8 lib
