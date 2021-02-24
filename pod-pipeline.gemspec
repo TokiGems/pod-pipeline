@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
     s.name        = 'pod-pipeline'
-    s.version     = '0.0.2'
+    s.version     = '0.0.3'
     s.summary     = "[暂时不可用]Cocoapods流水线工具"
     s.description = "[暂时不可用]为组件化开发设计的集项目构建、编译、发布为一体的强大工具"
     s.authors     = ["郑贤达"]
