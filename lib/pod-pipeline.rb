@@ -1,6 +1,15 @@
 require 'pod-pipeline/scan'
 
 class PodPipeline
+  # Scan local files!
+  #
+  # Example:
+  #   >> PodPipeline.scan("all")
+  #   => podgitworkspace
+  #
+  # Arguments:
+  #   language: (String)
+  
     def self.scan(media)
         scan = Scan.new
         case media
