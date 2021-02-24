@@ -4,12 +4,13 @@ class PodPipeline
     #
     # Scan local files!
     #
-    # == Example:
-    #   >> PodPipeline.scan("all")
-    #   => podgitworkspace
     # @param [String] media 选择扫描内容
     #
     # @return String 扫描结果
+    #
+    # @example
+    #   >> PodPipeline.scan("all")
+    #   => podgitworkspace
     #
     def self.scan(media)
         scan = Scan.new
