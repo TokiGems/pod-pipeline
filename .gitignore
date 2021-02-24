@@ -1,3 +1,5 @@
 *.gem
+
+# Yardoc
 .yardoc
-doc/
+/doc
