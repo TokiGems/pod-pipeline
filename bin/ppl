@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require 'ppl'
+
+PPL::Command.run(ARGV)

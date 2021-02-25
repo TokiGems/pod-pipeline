@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
     s.homepage    = 'https://rubygems.org/gems/pod-pipeline'
     s.license     = 'MIT'
 
-    s.executables << 'pod-pipeline'
+    s.executables = ["ppl", "pod-pipeline"]
 
     ## Make sure you can build the gem on older versions of RubyGems too:
     s.rubygems_version = "1.6.2"
