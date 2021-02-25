@@ -29,11 +29,7 @@ module PPL
                 @channels           = argv.arguments!
                 @path               = argv.option('path', '').split(',').first
                 
-                if @path
-                    @localPath = @path
-                else
-                    @localPath = Pathname.pwd
-                end
+                @localPath = @path ? @path : Pathname.pwd
 
                 super
             end
