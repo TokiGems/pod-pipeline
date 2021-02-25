@@ -1,3 +1,6 @@
+# encoding: UTF-8
+require 'cocoapods'
+
 Gem::Specification.new do |s|
     s.name        = 'pod-pipeline'
     s.version     = '0.0.6'
@@ -9,7 +12,13 @@ Gem::Specification.new do |s|
     s.homepage    = 'https://rubygems.org/gems/pod-pipeline'
     s.license     = 'MIT'
 
-    s.executables = ["ppl", "pod-pipeline"]
+    s.executables = ["ppl"]
+
+    s.add_runtime_dependency 'cocoapods-core',       "= #{Pod::VERSION}"     # CocoaPods核心代码，对应本地版本号
+    
+    s.add_runtime_dependency 'git',                  '>= 1.8.1', '< 2.0'     # Git项目管理工具
+    s.add_runtime_dependency 'xcodeproj',            '>= 1.19.0', '< 2.0'    # Cocoapods团队的xcode项目管理工具
+    s.add_runtime_dependency 'claide',               '>= 1.0.2', '< 2.0'     # 命令行工具
 
     ## Make sure you can build the gem on older versions of RubyGems too:
     s.rubygems_version = "1.6.2"
