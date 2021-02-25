@@ -1,4 +1,16 @@
 #!/usr/bin/env ruby
 require 'ppl'
 
+if Encoding.default_external != Encoding::UTF_8
+
+    STDERR.puts <<-DOC
+        \e[33mWARNING: Pod-Pipeline requires your terminal to be using UTF-8 encoding.
+        Consider adding the following to ~/.profile:
+    
+        export LANG=en_US.UTF-8
+        \e[0m
+    DOC
+  
+end
+
 PPL::Command.run(ARGV)
