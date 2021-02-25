@@ -7,6 +7,12 @@ module PPL
         self.abstract_command = true
         self.command = 'ppl'
         self.description = 'Pod-Pipeline 是 CocoaPods 的流水线工具.'
+        
+        def self.options
+            [
+              ['--help', '展示改命令的介绍面板'],
+            ]
+        end
 
         def self.run(argv)
             ensure_not_root_or_allowed! argv
