@@ -1,17 +1,8 @@
-require 'cocoapods-core'
-require 'git'
-require 'xcodeproj'
-
-require 'pod-pipeline/extension/git-ppl.rb'
-require 'pod-pipeline/extension/workspace-ppl.rb'
+require 'pod-pipeline/util/scanner'
 
 module PPL
     class Command
         class Scan < Command
-            @@podspec
-            @@git
-            @@workspace
-
             self.summary = '项目扫描'
             self.description = <<-DESC
                 获取项目的关键参数
@@ -29,97 +20,17 @@ module PPL
                 @channels           = argv.arguments!
                 @path               = argv.option('path', '').split(',').first
                 
-                @localPath = @path ? @path : Pathname.pwd
+                @projectPath = @path ? @path : Pathname.pwd
 
                 super
             end
 
             def run
-                @channels = ["all"] if @channels.count.zero?
+                PPL::Scanner.new(@channels, @projectPath).run
                 
-                puts "扫描#{@channels.join(", ")}内容"
-
-                @channels.each do |channel|
-                    case channel
-                    when "all"
-                        @@podspec = scan_podspec @localPath
-                        @@git = scan_git @localPath
-                        @@workspace = scan_workspace @localPath
-                    when "pod"
-                        @@podspec = scan_podspec @localPath
-                    when "git"
-                        @@git = scan_git @localPath
-                    when "workspace"
-                        @@workspace = scan_workspace @localPath
-                    else
-                        raise "暂不支持#{channel}内容扫描"
-                    end
-                end
-            end
-
-            #----------------------------------------#
-
-            def self.podspec
-                @@podspec
-            end
-
-            def self.git
-                @@git
-            end
-
-            def self.workspace
-                @@workspace
-            end
-
-            #----------------------------------------#
-
-            private
-
-            #
-            # 检查项目的 podspec 文件
-            #
-            # @param [String] localPath 项目根目录
-            #
-            # @return [Pod::Specification] 新 {Pod::Specification} 实例
-            #
-            def scan_podspec(localPath)
-                podspec_files = Pathname.glob(localPath + '/*.podspec{.json,}')
-                if podspec_files.count.zero? || podspec_files.count > 1
-                    raise '未找到或存在多个 *.podspec 文件'
-                end
-                podspec_file = podspec_files.first
-                linter = Pod::Specification::Linter.new(podspec_file)
-                unless linter.spec
-                    raise 'podspec文件异常'
-                end
-                linter.spec
-            end
-
-            #
-            # 检查项目的 Git 库
-            #
-            # @param [String] localPath 项目根目录
-            #
-            # @return [Git] 新 {Git} 实例
-            #
-            def scan_git(localPath)
-                Git.open(localPath)
-            end
-
-            #
-            # 检查项目的 workspace
-            #
-            # @param [String] localPath 项目根目录
-            #
-            # @return [Xcodeproj::Workspace] 新的 {Xcodeproj::Workspace} 实例
-            #
-            def scan_workspace(localPath)
-                workspace_files = Dir[localPath + '/Example/*.xcworkspace']
-                if workspace_files.count.zero? || workspace_files.count > 1
-                    raise '未找到或存在多个 *.xcworkspace 文件'
-                end
-                workspace_file = workspace_files.first
-                Xcodeproj::Workspace.open(workspace_file)
+                puts "Pod: #{PPL::Scanner.podspec}" if PPL::Scanner.podspec
+                puts "Git: remote = #{PPL::Scanner.git.remote}, branch = #{PPL::Scanner.git.branches.current.first}" if PPL::Scanner.git
+                puts "Workspace: #{PPL::Scanner.workspace.path}" if PPL::Scanner.workspace
             end
         end
     end
