@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require 'ppl'
+require 'pod-pipeline'
 
 if Encoding.default_external != Encoding::UTF_8
 

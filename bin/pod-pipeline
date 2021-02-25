@@ -1,5 +1,0 @@
-#!/usr/bin/env ruby
-
-require 'pod-pipeline'
-
-puts PodPipeline.scan(ARGV[0])

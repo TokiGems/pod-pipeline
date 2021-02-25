@@ -2,7 +2,7 @@ require 'claide'
 
 module PPL
     class Command < CLAide::Command
-        require 'pod-pipeline/command/log'
+        require 'pod-pipeline/command/scan'
 
         self.abstract_command = true
         self.command = 'ppl'
