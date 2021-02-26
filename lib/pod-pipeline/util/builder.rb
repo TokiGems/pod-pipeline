@@ -1,6 +1,7 @@
 require 'pod-pipeline/util/scanner'
 require 'pod-pipeline/util/xcodebuild'
 require 'pod-pipeline/util/binary'
+require 'pod-pipeline/util/bundle'
 
 module PPL
     class Builder
@@ -32,6 +33,10 @@ module PPL
             #合并二进制文件
             puts "\n[合并 #{@combines.join(", ")} 的二进制文件]"
             combine_binarys(@combines.include?('local'), @combines.include?('pod'))
+
+            #合并资源包
+            puts "\n[合并 #{@combines.join(", ")} 的资源包]"
+            combine_bundles(@combines.include?('local'), @combines.include?('pod'))
         end
 
         def combine_binarys(local_dependency, pod_dependency)
@@ -56,6 +61,30 @@ module PPL
             end
 
             Binary.combine("#{framework_path}/#{@podspec.name}", inputs)
+        end
+        
+        def combine_bundles(local_dependency, pod_dependency)
+            bundle_path = "#{@build_path}/#{@podspec.name}.bundle"
+            Dir.mkdir(bundle_path) unless Dir.exists? bundle_path
+
+            #添加 构建生成的资源包
+            inputs = ["${output_directory_path}/**/${POD_NAME}/*.bundle"]
+            if local_dependency
+                #添加 本地依赖的资源包
+                inputs << "#{@output}/#{@podspec.name}/Libraries/**/*.bundle" 
+                inputs << "#{@output}/#{@podspec.name}/Frameworks/**/*.bundle"
+            end
+            if pod_dependency
+                #添加 Pod依赖库构建生成的资源包
+                inputs << "#{@build_path}/**/*.bundle"
+                #添加 Pod依赖库预先构建的资源包
+                inputs << "#{@output}/Example/Pods/**/*SDK/*.bundle"
+                #添加 Pod依赖库本地依赖的资源包
+                inputs << "#{@output}/Example/Pods/**/Libraries/**/*.bundle"
+                inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.bundle"
+            end
+
+            Bundle.combine(bundle_path, inputs)
         end
     end
 end
