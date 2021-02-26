@@ -2,20 +2,12 @@ require 'xcodeproj'
 
 module Xcodeproj
     class Workspace
-        public
+        attr_accessor :path
 
         def self.open(path)
             workspace = new_from_xcworkspace(path)
-            workspace.setPath(path)
+            workspace.path = path
             workspace
-        end
-
-        def setPath(path)
-            @path = path
-        end
-
-        def path
-            @path
         end
     end
 end
