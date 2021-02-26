@@ -1,0 +1,61 @@
+require 'pod-pipeline/util/scanner'
+require 'pod-pipeline/util/xcodebuild'
+require 'pod-pipeline/util/binary'
+
+module PPL
+    class Builder
+        def initialize(projectPath, output, configuration, archs, combines)
+            @projectPath = projectPath
+            @output = output
+            @configuration = configuration
+            @archs = archs
+            @combines = combines
+        end
+
+        def run
+            PPL::Scanner.new(["pod", "workspace"], @projectPath).run
+            
+            @podspec = PPL::Scanner.podspec
+            @workspace = PPL::Scanner.workspace
+            puts "Pod: #{@podspec}"
+            puts "Workspace: #{@workspace.path}"
+            
+            #构建
+            puts "\n[构建 #{@configuration} 环境的 #{@archs.join(", ")} 架构项目]"
+            @build_path = "#{@output}/#{@podspec.name}-#{@podspec.version}"
+            #重置 构建目录
+            `rm -fr #{@build_path};mkdir #{@build_path}`
+            @archs.each do |arch|
+                XCodebuild.build(@workspace.path, @podspec.name, arch, @configuration, @build_path)
+            end
+
+            #合并二进制文件
+            puts "\n[合并 #{@combines.join(", ")} 的二进制文件]"
+            combine_binarys(@combines.include?('local'), @combines.include?('pod'))
+        end
+
+        def combine_binarys(local_dependency, pod_dependency)
+            framework_path = "#{@build_path}/#{@podspec.name}.framework"
+            Dir.mkdir(framework_path) unless Dir.exists? framework_path
+
+            #添加 构建生成的二进制文件
+            inputs = ["#{@build_path}/**/lib#{@podspec.name}.a"]
+            if local_dependency
+                #添加 本地依赖的二进制文件
+                inputs << "#{@output}/#{@podspec.name}/Libraries/**/*.a" 
+                inputs << "#{@output}/#{@podspec.name}/Frameworks/**/*.framework/*"
+            end
+            if pod_dependency
+                #添加 Pod依赖库构建生成的二进制文件
+                inputs << "#{@build_path}/**/lib*.a";
+                #添加 Pod依赖库预先构建的二进制文件
+                inputs << "#{@output}/Example/Pods/**/*SDK/*.framework/*"
+                #添加 Pod依赖库本地依赖的二进制文件
+                inputs << "#{@output}/Example/Pods/**/Libraries/**/*.a"
+                inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.framework/*"
+            end
+
+            Binary.combine("#{framework_path}/#{@podspec.name}", inputs)
+        end
+    end
+end
