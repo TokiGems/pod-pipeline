@@ -30,6 +30,14 @@ module PPL
                 XCodebuild.build(@workspace.path, @podspec.name, arch, @configuration, @build_path)
             end
 
+            #生成Framework
+            @framework_path = "#{@build_path}/#{@podspec.name}.framework"
+            Dir.mkdir(@framework_path) unless Dir.exists? @framework_path
+            @framework_headers_path = "#{@framework_path}/Headers"
+            Dir.mkdir(@framework_headers_path) unless Dir.exists? @framework_headers_path
+            #生成Bundle
+            @bundle_path = "#{@build_path}/#{@podspec.name}.bundle"
+            Dir.mkdir(@bundle_path) unless Dir.exists? @bundle_path
             #合并二进制文件
             puts "\n[合并 #{@combines.join(", ")} 的二进制文件]"
             combine_binarys(@combines.include?('local'), @combines.include?('pod'))
@@ -40,9 +48,6 @@ module PPL
         end
 
         def combine_binarys(local_dependency, pod_dependency)
-            framework_path = "#{@build_path}/#{@podspec.name}.framework"
-            Dir.mkdir(framework_path) unless Dir.exists? framework_path
-
             #添加 构建生成的二进制文件
             inputs = ["#{@build_path}/**/lib#{@podspec.name}.a"]
             if local_dependency
@@ -60,13 +65,10 @@ module PPL
                 inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.framework/*"
             end
 
-            Binary.combine("#{framework_path}/#{@podspec.name}", inputs)
+            Binary.combine("#{@framework_path}/#{@podspec.name}", inputs)
         end
         
         def combine_bundles(local_dependency, pod_dependency)
-            bundle_path = "#{@build_path}/#{@podspec.name}.bundle"
-            Dir.mkdir(bundle_path) unless Dir.exists? bundle_path
-
             #添加 构建生成的资源包
             inputs = ["${output_directory_path}/**/${POD_NAME}/*.bundle"]
             if local_dependency
@@ -84,7 +86,7 @@ module PPL
                 inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.bundle"
             end
 
-            Bundle.combine(bundle_path, inputs)
+            Bundle.combine(@bundle_path, inputs)
         end
     end
 end
