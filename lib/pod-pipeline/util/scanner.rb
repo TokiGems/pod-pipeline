@@ -19,7 +19,7 @@ module PPL
         def run
             @channels = ["all"] if @channels.count.zero?
             
-            puts "扫描#{@channels.join(", ")}内容"
+            puts "\n[扫描 #{@channels.join(", ")} 内容]"
 
             @channels.each do |channel|
                 case channel
