@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
     s.authors     = ["郑贤达"]
     s.email       = 'zhengxianda0512@gmail.com'
     s.files       = Dir["lib/**/*.rb"]
-    s.homepage    = 'https://rubygems.org/gems/pod-pipeline'
+    s.homepage    = 'https://github.com/TokiGems/pod-pipeline
     s.license     = 'MIT'
 
     s.executables = ["ppl"]
