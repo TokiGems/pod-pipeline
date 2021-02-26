@@ -1,3 +1,5 @@
+require 'fileutils'
+
 require 'pod-pipeline/util/scanner'
 require 'pod-pipeline/util/xcodebuild'
 require 'pod-pipeline/util/binary'
@@ -38,6 +40,11 @@ module PPL
             #生成Bundle
             @bundle_path = "#{@build_path}/#{@podspec.name}.bundle"
             Dir.mkdir(@bundle_path) unless Dir.exists? @bundle_path
+
+            #添加头文件
+            puts "\n[添加Framework头文件]"
+            add_headers
+
             #合并二进制文件
             puts "\n[合并 #{@combines.join(", ")} 的二进制文件]"
             combine_binarys(@combines.include?('local'), @combines.include?('pod'))
@@ -45,6 +52,16 @@ module PPL
             #合并资源包
             puts "\n[合并 #{@combines.join(", ")} 的资源包]"
             combine_bundles(@combines.include?('local'), @combines.include?('pod'))
+        end
+
+        def add_headers
+            header_stands = "#{@output}/Example/Pods/Headers/Public/#{@podspec.name}/*.h"
+            Dir[header_stands].each do |header_stand|
+                if File.ftype(header_stand).eql? 'link'
+                    header = "#{File.dirname(header_stand)}/#{File.readlink(header_stand)}"
+                    FileUtils.cp(header, @framework_headers_path)
+                end
+            end
         end
 
         def combine_binarys(local_dependency, pod_dependency)
