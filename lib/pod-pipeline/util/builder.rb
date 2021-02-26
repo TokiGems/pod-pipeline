@@ -65,6 +65,7 @@ module PPL
         end
 
         def combine_binarys(local_dependency, pod_dependency)
+            binary = "#{@framework_path}/#{@podspec.name}"
             #添加 构建生成的二进制文件
             inputs = ["#{@build_path}/**/lib#{@podspec.name}.a"]
             if local_dependency
@@ -82,7 +83,8 @@ module PPL
                 inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.framework/*"
             end
 
-            Binary.combine("#{@framework_path}/#{@podspec.name}", inputs)
+            Binary.combine(binary, inputs)
+            Binary.thin(binary, @archs)
         end
         
         def combine_bundles(local_dependency, pod_dependency)

@@ -47,5 +47,19 @@ module PPL
                 end
             end 
         end
+
+        def self.thin(binary, archs)
+            archs.each do |arch|
+                `lipo "#{binary}" -thin #{arch} -output "#{binary}-#{arch}"`
+            end
+            File.delete(binary)
+
+            binary_pieces = "#{binary}-*"
+            combine(binary, [binary_pieces])
+            
+            Dir[binary_pieces].each do |binary_piece|
+                File.delete(binary_piece)
+            end
+        end
     end
 end
