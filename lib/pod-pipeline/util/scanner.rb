@@ -11,9 +11,9 @@ module PPL
         @@git = nil
         @@workspace = nil
 
-        def initialize(channels, projectPath)
-            @channels = channels
+        def initialize(projectPath, channels)
             @projectPath = projectPath
+            @channels = channels
         end
 
         def run

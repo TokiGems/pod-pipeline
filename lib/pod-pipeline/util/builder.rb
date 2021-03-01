@@ -18,7 +18,7 @@ module PPL
         end
 
         def run
-            PPL::Scanner.new(["pod", "workspace"], @projectPath).run
+            PPL::Scanner.new(@projectPath, ["pod", "workspace"]).run
             
             @podspec = PPL::Scanner.podspec
             @workspace = PPL::Scanner.workspace

@@ -8,25 +8,25 @@ module PPL
                 获取项目的关键参数
             DESC
             self.arguments = [
-                CLAide::Argument.new('CHANNELS', false, true),
+                CLAide::Argument.new('项目根目录（默认使用当前目录）', false),
             ]
             def self.options
                 [
-                  ['--path=./**/*.podspec', '项目根目录。(默认使用当前目录)'],
+                    ['--channel=pod,git,workspace', '扫描内容。（默认扫描所有内容）']
                 ].concat(super)
             end
 
             def initialize(argv)
-                @channels           = argv.arguments!
-                @path               = argv.option('path', '').split(',').first
+                @path                   = argv.arguments!
+                @channels               = argv.option('channel', '').split(',')
                 
-                @projectPath = @path ? @path : Pathname.pwd
+                @projectPath = @path.count.zero? ? Pathname.pwd : @path.first
 
                 super
             end
 
             def run
-                PPL::Scanner.new(@channels, @projectPath).run
+                PPL::Scanner.new(@projectPath, @channels).run
                 
                 puts "Pod: #{PPL::Scanner.podspec}" if PPL::Scanner.podspec
                 puts "Git: remote = #{PPL::Scanner.git.remote}, branch = #{PPL::Scanner.git.branches.current.first}" if PPL::Scanner.git

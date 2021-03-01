@@ -8,25 +8,25 @@ module PPL
                 构建项目代码、资源文件和依赖库，生成Framework包和Bundle包
             DESC
             self.arguments = [
+                CLAide::Argument.new('项目根目录（默认使用当前目录）', false),
             ]
             def self.options
                 [
-                  ['--path=./**/*.podspec', '项目根目录。(默认使用当前目录)'],
-                  ['--output=./', '项目构建的输出目录。(默认使用项目根目录)'],
-                  ['--configuration=Release', '项目构建的环境。(默认为Release)'],
-                  ['--arch=arm64,armv7,x86_64', '项目构建的架构。(默认为 arm64,armv7,x86_64)'],
-                  ['--combine=local,pod', '项目构建后合并依赖库的二进制文件，local为本地依赖库，pod为CocoaPods依赖库。(默认为 local)'],
+                    ['--output=./', '项目构建的输出目录。(默认使用项目根目录)'],
+                    ['--configuration=Release', '项目构建的环境。(默认为Release)'],
+                    ['--arch=arm64,armv7,x86_64', '项目构建的架构。(默认为 arm64,armv7,x86_64)'],
+                    ['--combine=local,pod', '项目构建后合并依赖库的二进制文件，local为本地依赖库，pod为CocoaPods依赖库。(默认为 local)'],
                 ].concat(super)
             end
 
             def initialize(argv)
-                @path               = argv.option('path', '').split(',').first
+                @path               = argv.arguments!
                 @output             = argv.option('output', '').split(',').first
                 @configuration      = argv.option('configuration', '').split(',').first
                 @archs              = argv.option('arch', '').split(',')
                 @combines           = argv.option('combine', '').split(',')
                 
-                @projectPath = @path ? @path : Pathname.pwd
+                @projectPath = @path.count.zero? ? Pathname.pwd : @path.first
                 @output = @output ? @output : @projectPath
 
                 super
