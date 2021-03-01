@@ -7,6 +7,7 @@ require 'pod-pipeline/extension/workspace-ppl.rb'
 
 module PPL
     class Scanner
+        @@linter = nil
         @@podspec = nil
         @@git = nil
         @@workspace = nil
@@ -24,11 +25,13 @@ module PPL
             @channels.each do |channel|
                 case channel
                 when "all"
-                    @@podspec = scan_podspec @projectPath
+                    @@linter = scan_pod @projectPath
+                    @@podspec = @@linter.spec
                     @@git = scan_git @projectPath
                     @@workspace = scan_workspace @projectPath
                 when "pod"
-                    @@podspec = scan_podspec @projectPath
+                    @@linter = scan_pod @projectPath
+                    @@podspec = @@linter.spec
                 when "git"
                     @@git = scan_git @projectPath
                 when "workspace"
@@ -40,6 +43,10 @@ module PPL
         end
 
         #----------------------------------------#
+
+        def self.linter
+            @@linter
+        end
 
         def self.podspec
             @@podspec
@@ -64,7 +71,7 @@ module PPL
         #
         # @return [Pod::Specification] 新 {Pod::Specification} 实例
         #
-        def scan_podspec(projectPath)
+        def scan_pod(projectPath)
             podspec_files = Pathname.glob(projectPath + '/*.podspec{.json,}')
             if podspec_files.count.zero? || podspec_files.count > 1
                 raise '未找到或存在多个 *.podspec 文件'
@@ -74,7 +81,7 @@ module PPL
             unless linter.spec
                 raise 'podspec文件异常'
             end
-            linter.spec
+            linter
         end
 
         #
