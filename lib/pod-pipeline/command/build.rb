@@ -5,7 +5,7 @@ module PPL
         class Build < Command
             self.summary = '项目构建'
             self.description = <<-DESC
-                获取项目的关键参数
+                构建项目代码、资源文件和依赖库，生成Framework包和Bundle包
             DESC
             self.arguments = [
             ]
