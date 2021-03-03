@@ -15,6 +15,22 @@ module PPL
             ]
         end
 
+        def self.options_extension
+            options = Array.new
+            options_extension_hash.each { |_key, _options_extension|
+                _options_extension.each { |_option_extension| 
+                  options << [_option_extension.first.gsub(/(--)(.*)/,"\\1#{_key}-\\2"), _option_extension.last]
+                } 
+            }
+            options
+        end
+
+        def self.options_extension_hash
+            Hash[
+              
+            ]
+        end
+
         def self.run(argv)
             ensure_not_root_or_allowed! argv
             verify_minimum_git_version!
@@ -68,6 +84,34 @@ module PPL
                 'you must do to use CocoaPods. Agree to the license by running: ' \
                 '`xcodebuild -license`.'
             end
-          end
+        end
+
+        def initialize(argv)
+            @argv_extension = Hash.new
+            self.class.options_extension_hash.each_key { |key|
+                @argv_extension[key] = Array.new
+                self.class.options.each do |option|
+                    name = option.first
+                    if name.include?(key)
+                        is_option = name.include? '='
+                        if is_option
+                            option = name.gsub(/(--)(.*)(=.*)/,"\\2")
+                            value = argv.option(option, '')
+                            @argv_extension[key] << name.gsub(/(--.*=)(.*)/,"\\1#{value}").gsub("#{key}-",'') unless value.empty?
+                        else
+                            flag = name.gsub(/(--)(.*)/,'\\2')
+                            value = argv.flag?(flag)
+                            @argv_extension[key] << name.gsub("#{key}-",'') if value
+                        end
+                    end
+                end
+            }
+
+            super
+        end
+
+        def argv_extension
+            @argv_extension 
+        end
     end
 end
