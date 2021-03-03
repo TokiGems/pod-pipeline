@@ -21,22 +21,13 @@ module PPL
             ]
             def self.options
                 [
-                    ['--channel=version,git,repo', '更新内容。（默认更新所有内容）'],
-                    ['--repo=master', 'Pod库所属的repo。（默认使用官方repo：master）'],
-                ].concat(super).concat(options_extension)
-            end
-
-            def self.options_extension_hash
-                Hash[
-                    'trunk-push' => Pod::Command::Trunk::Push.options,
-                    'repo-push' => Pod::Command::Repo::Push.options
-                ]
+                    ['--channel=version,git', '更新内容。（默认更新所有内容）'],
+                ].concat(super)
             end
 
             def initialize(argv)
                 @path                   = argv.arguments!
                 @channels               = argv.option('channel', '').split(',')
-                @repo                   = argv.option('repo', '').split(',').first
                 
                 @projectPath = @path.count.zero? ? Pathname.pwd : @path.first
                 @is_master = false
@@ -60,13 +51,10 @@ module PPL
                     when "all"
                         update_version
                         update_git
-                        update_repo
                     when "version"
                         update_version
                     when "git"
                         update_git
-                    when "repo"
-                        update_repo
                     else
                         raise "暂不支持#{channel}内容扫描"
                     end
@@ -90,18 +78,6 @@ module PPL
                 git.commit_all(new_tag)
                 git.add_tag(new_tag)
                 git.push(git.remote, git.branches.current.first, true)
-            end
-
-            def update_repo
-                podspec_file = PPL::Scanner.linter.file
-                
-                if @is_master
-                    push_argv = [podspec_file] + argv_extension['trunk-push']
-                    Pod::Command::Trunk::Push.run(push_argv)
-                else
-                    push_argv = [@repo, podspec_file] + argv_extension['repo-push']
-                    Pod::Command::Repo::Push.run(push_argv)
-                end
             end
         end
     end
