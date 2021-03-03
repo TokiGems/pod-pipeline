@@ -5,6 +5,7 @@ module PPL
         require 'pod-pipeline/command/scan'
         require 'pod-pipeline/command/build'
         require 'pod-pipeline/command/update'
+        require 'pod-pipeline/command/publish'
 
         self.abstract_command = true
         self.command = 'ppl'
