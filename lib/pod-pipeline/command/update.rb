@@ -14,7 +14,7 @@ module PPL
         class Update < Command
             self.summary = '项目扫描'
             self.description = <<-DESC
-                获取项目的关键参数
+                更新项目内容
             DESC
             self.arguments = [
                 CLAide::Argument.new('项目根目录（默认使用当前目录）', false),
