@@ -22,12 +22,14 @@ module PPL
             def self.options
                 [
                     ['--channel=version,git', '更新内容。（默认更新所有内容）'],
+                    ['--version=x.x.x', '新版本号。（默认使用patch+1）']
                 ].concat(super)
             end
 
             def initialize(argv)
                 @path                   = argv.arguments!
                 @channels               = argv.option('channel', '').split(',')
+                @new_version                = argv.option('version', '').split(',').first
                 
                 @projectPath = @path.count.zero? ? Pathname.pwd : @path.first
                 @is_master = false
@@ -64,7 +66,11 @@ module PPL
             def update_version
                 version = PPL::Scanner.podspec.version
                 raise "版本号异常，无法更新" unless version
-                version.increase_patch
+                if @new_version
+                    version.archiving(@new_version)
+                else
+                    version.increase_patch 
+                end
 
                 PPL::Scanner.linter.write_to_file('version', version.version)
             end
