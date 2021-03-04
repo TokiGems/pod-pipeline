@@ -10,6 +10,8 @@ $ [sudo] gem install pod-pipeline
 
 ## Usage
 
+ppl --help
+
 ### Argument handling
 
 ### Command handling
