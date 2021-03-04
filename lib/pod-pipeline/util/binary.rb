@@ -36,14 +36,14 @@ module PPL
                     combine_log = 
                     `libtool -static -o "#{output}" "#{output_temp}" #{input_file_queue}
                     echo result:$?`
-                    raise "\ncombine log:\n#{build_log}" unless combine_log.include? 'result:0'
+                    raise "\ncombine log:\n#{combine_log}" unless combine_log.include? 'result:0'
                     
                     File.delete(output_temp)
                 else
                     combine_log = 
                     `libtool -static -o "#{output}" #{input_file_queue}
                     echo result:$?`
-                    raise "\ncombine log:\n#{build_log}" unless combine_log.include? 'result:0'
+                    raise "\ncombine log:\n#{combine_log}" unless combine_log.include? 'result:0'
                 end
             end 
         end
