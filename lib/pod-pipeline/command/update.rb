@@ -81,6 +81,7 @@ module PPL
                 git.tags.each do |tag|
                     raise "当前版本 #{new_tag} 已发布，请尝试其他版本号" if tag.name.eql? new_tag
                 end
+                git.add('.')
                 git.commit_all(new_tag)
                 git.add_tag(new_tag)
                 git.push(git.remote, git.branches.current.first, true)
