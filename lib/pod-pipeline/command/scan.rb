@@ -20,7 +20,7 @@ module PPL
                 @path                   = argv.arguments!
                 @channels               = argv.option('channel', '').split(',')
                 
-                @projectPath = @path.count.zero? ? Pathname.pwd : @path.first
+                @projectPath = @path.count.zero? ? Pathname.pwd.to_s : @path.first
 
                 super
             end

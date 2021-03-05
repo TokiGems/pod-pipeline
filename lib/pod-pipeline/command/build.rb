@@ -33,7 +33,7 @@ module PPL
                 @archs              = argv.option('arch', '').split(',')
                 @combines           = argv.option('combine', '').split(',')
                 
-                @projectPath = @path.count.zero? ? Pathname.pwd : @path.first
+                @projectPath = @path.count.zero? ? Pathname.pwd.to_s : @path.first
                 @output = @output ? @output : @projectPath
 
                 super

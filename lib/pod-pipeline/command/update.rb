@@ -31,7 +31,7 @@ module PPL
                 @channels               = argv.option('channel', '').split(',')
                 @new_version                = argv.option('version', '').split(',').first
                 
-                @projectPath = @path.count.zero? ? Pathname.pwd : @path.first
+                @projectPath = @path.count.zero? ? Pathname.pwd.to_s : @path.first
                 @is_master = false
                 unless @repo
                     @repo = 'master'
