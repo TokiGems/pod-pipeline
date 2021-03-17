@@ -128,7 +128,7 @@ module PPL
             
             def combine_bundles(local_dependency, pod_dependency)
                 #添加 构建生成的资源包
-                inputs = ["${output_directory_path}/**/${POD_NAME}/*.bundle"]
+                inputs = ["#{@output}/**/#{@podspec.name}/*.bundle"]
                 if local_dependency
                     #添加 本地依赖的资源包
                     inputs << "#{@output}/#{@podspec.name}/Libraries/**/*.bundle" 
