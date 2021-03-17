@@ -23,6 +23,7 @@ module PPL
                     ['--configuration=Release', '项目构建的环境。(默认为Release)'],
                     ['--arch=arm64,armv7,x86_64', '项目构建的架构。(默认为 arm64,armv7,x86_64)'],
                     ['--combine=local,pod', '项目构建后合并依赖库的二进制文件，local为本地依赖库，pod为CocoaPods依赖库。(默认为 local)'],
+                    ['--bundle-merge=merge', '是否合并所有资源包，参数为合并后的资源包名。(默认为 不合并)'],
                 ].concat(super)
             end
 
@@ -32,6 +33,7 @@ module PPL
                 @configuration      = argv.option('configuration', '').split(',').first
                 @archs              = argv.option('arch', '').split(',')
                 @combines           = argv.option('combine', '').split(',')
+                @bundle_merge       = argv.option('bundle-merge', '').split(',').first
                 
                 @projectPath = @path.count.zero? ? Pathname.pwd.to_s : @path.first
                 @output = @output ? @output : @projectPath
@@ -70,8 +72,12 @@ module PPL
 
                 #拷贝构建内容到Pod目录
                 puts "\n[拷贝内容到Pod目录]"
-                FileUtils.cp_r(@framework_path, @sdk_path)
-                FileUtils.cp_r(@bundle_path, @sdk_path)
+                Dir["#{@framework_path}"].each do |framework|
+                    `cp -fr "#{framework}" "#{@sdk_path}"`
+                end
+                Dir["#{@build_path}/*.bundle"].each do |bundle|
+                    `cp -fr "#{bundle}" "#{@sdk_path}"`
+                end
             end
 
             def reset_dir
@@ -83,9 +89,6 @@ module PPL
                 Dir.reset(@framework_path)
                 @framework_headers_path = "#{@framework_path}/Headers"
                 Dir.reset(@framework_headers_path)
-                #初始化 Bundle目录
-                @bundle_path = "#{@build_path}/#{@podspec.name}.bundle"
-                Dir.reset(@bundle_path)
                 #初始化 SDK目录
                 @sdk_path = "#{@output}/#{@podspec.name}/#{@podspec.name}SDK"
                 Dir.reset(@sdk_path)
@@ -144,8 +147,24 @@ module PPL
                     inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.bundle"
                 end
     
-                Bundle.combine(@bundle_path, inputs)
+                Bundle.combine(@build_path, inputs)
+
+                if @bundle_merge
+                    bundle_path = "#{@build_path}/#{@bundle_merge}"
+                    Dir.reset(bundle_path)
+                    
+                    Dir["#{@build_path}/*.bundle/*"].each do |asset|
+                        `cp -fr "#{asset}" "#{bundle_path}"`
+                    end
+
+                    Dir["#{@build_path}/*.bundle/"].each do |bundle|
+                        `rm -fr "#{bundle}"`
+                    end
+
+                    `mv "#{bundle_path}" "#{bundle_path}.bundle"`
+                end
             end
         end
     end
 end
+
