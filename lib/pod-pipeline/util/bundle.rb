@@ -13,7 +13,7 @@ module PPL
                     
                     #合并
                     puts "合并资源包：" + input_bundle
-                    FileUtils.cp_r(input_bundle, File.dirname(output), :preserve => true)
+                    FileUtils.cp_r(input_bundle, output, :preserve => true)
                 end
             end
         end
