@@ -50,7 +50,13 @@ module PPL
 
         def self.thin(binary, archs)
             archs.each do |arch|
-                `lipo "#{binary}" -thin #{arch} -output "#{binary}-#{arch}"`
+                combine_log = 
+                `lipo "#{binary}" -thin #{arch} -output "#{binary}-#{arch}"
+                echo result:$?`
+                unless combine_log.include? 'result:0'
+                    puts "lipo -thin 异常"
+                    return 
+                end
             end
             File.delete(binary)
 
