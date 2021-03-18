@@ -16,8 +16,9 @@ module PPL
                         next if File.basename(input_file).include? File.basename(ignore) 
                     end
                     #若 input_file 为非二进制文件 则跳过
-                    binary_check = `lipo -info "#{input_file}" > /dev/null 2>&1;echo $?`
-                    next unless binary_check.include? "0"
+                    info_log = `lipo -info "#{input_file}" > /dev/null 2>&1
+                    echo result:$?`
+                    next unless info_log.include? 'result:0'
                     #若 input_file 为序列中已存在的文件 则跳过
                     next if input_file_queue.include? input_file
 
@@ -34,14 +35,14 @@ module PPL
                     File.rename(output, output_temp)
 
                     combine_log = 
-                    `libtool -static -o "#{output}" "#{output_temp}" #{input_file_queue}
+                    `libtool -static -o "#{output}" "#{output_temp}" #{input_file_queue} > /dev/null 2>&1
                     echo result:$?`
                     raise "\ncombine log:\n#{combine_log}" unless combine_log.include? 'result:0'
                     
                     File.delete(output_temp)
                 else
                     combine_log = 
-                    `libtool -static -o "#{output}" #{input_file_queue}
+                    `libtool -static -o "#{output}" #{input_file_queue} > /dev/null 2>&1
                     echo result:$?`
                     raise "\ncombine log:\n#{combine_log}" unless combine_log.include? 'result:0'
                 end
@@ -50,10 +51,10 @@ module PPL
 
         def self.thin(binary, archs)
             archs.each do |arch|
-                combine_log = 
-                `lipo "#{binary}" -thin #{arch} -output "#{binary}-#{arch}"
+                thin_log = 
+                `lipo "#{binary}" -thin #{arch} -output "#{binary}-#{arch}" > /dev/null 2>&1
                 echo result:$?`
-                unless combine_log.include? 'result:0'
+                unless thin_log.include? 'result:0'
                     puts "lipo -thin 异常"
                     return 
                 end
