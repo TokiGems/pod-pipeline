@@ -66,18 +66,19 @@ module PPL
                 puts "\n[合并 #{@combines.join(", ")} 的二进制文件]"
                 combine_binarys(@combines.include?('local'), @combines.include?('pod'))
 
+                #拷贝资源包
+                puts "\n[拷贝 #{@combines.join(", ")} 的资源包 到输出目录]"
+                copy_bundles(@combines.include?('local'), @combines.include?('pod'))
+
                 #合并资源包
-                puts "\n[合并 #{@combines.join(", ")} 的资源包]"
-                combine_bundles(@combines.include?('local'), @combines.include?('pod'))
+                if @bundle_merge
+                    puts "\n[合并的资源包内容 到 #{@bundle_merge}.bundle]"
+                    merge_bundles
+                end
 
                 #拷贝构建内容到Pod目录
                 puts "\n[拷贝内容到Pod目录]"
-                Dir["#{@framework_path}"].each do |framework|
-                    `cp -fr "#{framework}" "#{@sdk_path}"`
-                end
-                Dir["#{@build_path}/*.bundle"].each do |bundle|
-                    `cp -fr "#{bundle}" "#{@sdk_path}"`
-                end
+                copy_pod
             end
 
             def reset_dir
@@ -129,7 +130,7 @@ module PPL
                 Binary.thin(binary, @archs)
             end
             
-            def combine_bundles(local_dependency, pod_dependency)
+            def copy_bundles(local_dependency, pod_dependency)
                 #添加 构建生成的资源包
                 inputs = ["#{@output}/**/#{@podspec.name}/*.bundle"]
                 if local_dependency
@@ -147,21 +148,34 @@ module PPL
                     inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.bundle"
                 end
     
-                Bundle.combine(@build_path, inputs)
+                Bundle.cp(inputs, @build_path)
+            end
 
-                if @bundle_merge
-                    bundle_path = "#{@build_path}/#{@bundle_merge}"
-                    Dir.reset(bundle_path)
-                    
-                    Dir["#{@build_path}/*.bundle/*"].each do |asset|
-                        `cp -fr "#{asset}" "#{bundle_path}"`
-                    end
+            def merge_bundles
+                #初始化资源文件夹
+                bundle_path = "#{@build_path}/#{@bundle_merge}"
+                Dir.reset(bundle_path)
+                
+                #合并资源文件
+                Dir["#{@build_path}/*.bundle/*"].each do |asset|
+                    `cp -fr "#{asset}" "#{bundle_path}"`
+                end
 
-                    Dir["#{@build_path}/*.bundle/"].each do |bundle|
-                        `rm -fr "#{bundle}"`
-                    end
+                #删除bundle
+                Dir["#{@build_path}/*.bundle/"].each do |bundle|
+                    `rm -fr "#{bundle}"`
+                end
 
-                    `mv "#{bundle_path}" "#{bundle_path}.bundle"`
+                #将资源文件夹命名为 .bundle 格式
+                `mv "#{bundle_path}" "#{bundle_path}.bundle"`
+            end
+
+            def copy_pod
+                Dir["#{@framework_path}"].each do |framework|
+                    `cp -fr "#{framework}" "#{@sdk_path}"`
+                end
+                Dir["#{@build_path}/*.bundle"].each do |bundle|
+                    `cp -fr "#{bundle}" "#{@sdk_path}"`
                 end
             end
         end
