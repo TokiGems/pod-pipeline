@@ -84,6 +84,8 @@ module PPL
                 git.add('.')
                 git.commit_all(new_tag)
                 git.add_tag(new_tag)
+
+                puts "[Git 上传 #{git.remote} #{git.branches.current.first} #{new_tag}]"
                 git.push(git.remote, git.branches.current.first, true)
             end
         end
