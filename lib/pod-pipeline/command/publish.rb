@@ -57,9 +57,11 @@ module PPL
                 podspec_file = PPL::Scanner.linter.file
                 
                 if @is_master
+                    puts "[发布 #{podspec_file}]"
                     push_argv = [podspec_file] + argv_extension['trunk-push']
                     Pod::Command::Trunk::Push.run(push_argv)
                 else
+                    puts "[发布 #{@repo} #{podspec_file}]"
                     push_argv = [@repo, podspec_file] + argv_extension['repo-push']
                     Pod::Command::Repo::Push.run(push_argv)
                 end
