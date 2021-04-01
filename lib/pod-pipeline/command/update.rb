@@ -12,7 +12,7 @@ require 'pod-pipeline/extension/validator-ppl'
 module PPL
     class Command
         class Update < Command
-            self.summary = '项目扫描'
+            self.summary = '项目更新'
             self.description = <<-DESC
                 更新项目内容
             DESC
