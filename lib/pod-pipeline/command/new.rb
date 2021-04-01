@@ -6,8 +6,8 @@ module PPL
             self.summary = '创建新项目'
             
             self.description = <<-DESC
-                根据CocoaPods的最佳实践，为名为 'NAME' 的新豆荚的开发创建一个脚手架。
-                如果未指定 '--template-url'，默认使用 'https://github.com/TokiPods/pod-template.git'。
+                根据TokiHunter的最佳实践，为名为 'NAME' 的新Pod库的开发创建一个脚手架。
+                如果未指定 '--lib-create-template-url'，默认使用 'https://github.com/TokiPods/pod-template.git'。
             DESC
 
             self.arguments = [

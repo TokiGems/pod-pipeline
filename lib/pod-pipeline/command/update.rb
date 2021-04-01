@@ -21,7 +21,7 @@ module PPL
             ]
             def self.options
                 [
-                    ['--channel=version,git', '更新内容。（默认更新所有内容）'],
+                    ['--channel=version,git', '更新内容，version为更新podspec文件中的的版本号，git为Git仓库添加对应podspec版本号的tag，并上传到远端。（默认更新所有内容）'],
                     ['--version=x.x.x', '新版本号。（默认使用patch+1）']
                 ].concat(super)
             end
