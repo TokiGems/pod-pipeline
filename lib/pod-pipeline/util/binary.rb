@@ -55,7 +55,7 @@ module PPL
                 `lipo "#{binary}" -thin #{arch} -output "#{binary}-#{arch}" > /dev/null 2>&1
                 echo result:$?`
                 unless thin_log.include? 'result:0'
-                    puts "lipo -thin 异常"
+                    puts "lipo #{binary} -thin #{arch} 异常"
                     return 
                 end
             end
