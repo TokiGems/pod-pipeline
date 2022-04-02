@@ -110,7 +110,9 @@ module PPL
             def combine_binarys(local_dependency, pod_dependency)
                 binary = "#{@framework_path}/#{@podspec.name}"
                 #添加 构建生成的二进制文件
-                inputs = ["#{@build_path}/**/lib#{@podspec.name}.a"]
+                inputs = []
+                inputs << "#{@build_path}/**/lib#{@podspec.name}.a"
+                inputs << "#{@build_path}/**/*.framework/#{@podspec.name}"
                 if local_dependency
                     #添加 本地依赖的二进制文件
                     inputs << "#{@output}/#{@podspec.name}/Libraries/**/*.a" 
@@ -119,6 +121,7 @@ module PPL
                 if pod_dependency
                     #添加 Pod依赖库构建生成的二进制文件
                     inputs << "#{@build_path}/**/lib*.a";
+                    inputs << "#{@build_path}/**/*.framework/*";
                     #添加 Pod依赖库预先构建的二进制文件
                     inputs << "#{@output}/Example/Pods/**/*SDK/*.framework/*"
                     #添加 Pod依赖库本地依赖的二进制文件
