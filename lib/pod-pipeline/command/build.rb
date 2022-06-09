@@ -99,10 +99,24 @@ module PPL
                 header_stands = "#{@output}/Example/Pods/Headers/Public/#{@podspec.name}/*.h"
                 Dir[header_stands].each do |header_stand|
                     if File.ftype(header_stand).eql? 'link'
-                        puts File.basename(header_stand)
-    
-                        header = "#{File.dirname(header_stand)}/#{File.readlink(header_stand)}"
-                        FileUtils.cp(header, @framework_headers_path)
+                        header_file = "#{File.dirname(header_stand)}/#{File.readlink(header_stand)}"
+                        if File.ftype(header_file).eql? 'file'
+                            header_file_basename = File.basename(header_file)
+                            if !(File.exist? "#{@framework_headers_path}/#{header_file_basename}")
+                                puts header_file_basename
+                                FileUtils.cp(header_file, @framework_headers_path)
+                            end
+                        end
+                    end
+                end
+                header_files = "#{@build_path}/**/#{@podspec.name}.framework/Headers/*.h"
+                Dir[header_files].each do |header_file|
+                    if File.ftype(header_file).eql? 'file'
+                        header_file_basename = File.basename(header_file)
+                        if !(File.exist? "#{@framework_headers_path}/#{header_file_basename}")
+                            puts header_file_basename
+                            FileUtils.cp(header_file, @framework_headers_path)
+                        end
                     end
                 end
             end
