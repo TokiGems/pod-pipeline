@@ -95,9 +95,6 @@ module PPL
                 Dir.reset(@framework_path)
                 @framework_headers_path = "#{@framework_path}/Headers"
                 Dir.reset(@framework_headers_path)
-                #初始化 SDK目录
-                @sdk_path = "#{@output}/#{@podspec.name}/#{@podspec.name}SDK"
-                Dir.reset(@sdk_path)
             end
     
             def add_headers
@@ -190,15 +187,6 @@ module PPL
 
                 #将资源文件夹命名为 .bundle 格式
                 `mv "#{bundle_path}" "#{bundle_path}.bundle"`
-            end
-
-            def copy_pod
-                Dir["#{@framework_path}"].each do |framework|
-                    `cp -fr "#{framework}" "#{@sdk_path}"`
-                end
-                Dir["#{@build_path}/*.bundle"].each do |bundle|
-                    `cp -fr "#{bundle}" "#{@sdk_path}"`
-                end
             end
         end
     end
