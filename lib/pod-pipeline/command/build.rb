@@ -49,6 +49,11 @@ module PPL
                 puts "Pod: #{@podspec}"
                 puts "Workspace: #{@workspace.path}"
                 
+                if ! @configuration || !@archs
+                    puts "无需构建"
+                    return
+                end
+
                 #初始化 构建目录
                 reset_dir
                 
