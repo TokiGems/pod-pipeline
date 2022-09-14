@@ -3,7 +3,7 @@ require 'cocoapods'
 
 Gem::Specification.new do |s|
     s.name        = 'pod-pipeline'
-    s.version     = '0.3.1'
+    s.version     = '0.4.0'
     s.summary     = "Cocoapods流水线工具"
     s.description = "为组件化开发设计的集项目构建、发布为一体的强大工具"
     s.authors     = ["郑贤达"]
