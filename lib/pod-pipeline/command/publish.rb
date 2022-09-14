@@ -27,7 +27,6 @@ module PPL
 
             def self.options_extension_hash
                 Hash[
-                    'build' => PPL::Command::Build.options,
                     'update' => PPL::Command::Update.options,
                     'trunk-push' => Pod::Command::Trunk::Push.options,
                     'repo-push' => Pod::Command::Repo::Push.options
@@ -49,7 +48,6 @@ module PPL
             end
 
             def run
-                PPL::Command::Build.run([@projectPath] + argv_extension['build'])
                 PPL::Command::Update.run([@projectPath] + argv_extension['update'])
 
                 PPL::Scanner.new(@projectPath, ['pod']).run
