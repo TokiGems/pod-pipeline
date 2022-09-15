@@ -49,7 +49,7 @@ module PPL
                 puts "Pod: #{@podspec}"
                 puts "Workspace: #{@workspace.path}"
                 
-                if ! @configuration || !@archs
+                if !@archs
                     puts "无需构建"
                     return
                 end
