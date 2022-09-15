@@ -80,10 +80,6 @@ module PPL
                     puts "\n[合并的资源包内容 到 #{@bundle_merge}.bundle]"
                     merge_bundles
                 end
-
-                #拷贝构建内容到Pod目录
-                puts "\n[拷贝内容到Pod目录]"
-                copy_pod
             end
 
             def reset_dir
