@@ -8,8 +8,11 @@ require 'pod-pipeline/extension/workspace-ppl.rb'
 module PPL
     class Scanner
         @@linter = nil
-        @@podspec = nil
+        @@name = nil
+        @@version = nil
         @@git = nil
+        @@remote = nil
+        @@branch = nil
         @@workspace = nil
 
         def initialize(projectPath, channels)
@@ -20,20 +23,29 @@ module PPL
         def run
             @channels = ["all"] if @channels.count.zero?
             
-            puts "\n[扫描 #{@channels.join(", ")} 内容]"
-
             @channels.each do |channel|
                 case channel
                 when "all"
+                    puts "\n[扫描 #{@projectPath.split("/").last} 内容]"
                     @@linter = scan_pod @projectPath
-                    @@podspec = @@linter.spec
+                    @@name = @@linter.spec.name
+                    @@version = @@linter.spec.version
                     @@git = scan_git @projectPath
+                    @@remote = @@git.remote
+                    @@branch = @@git.branches.current.first
                     @@workspace = scan_workspace @projectPath
-                when "pod"
+                when "name"
                     @@linter = scan_pod @projectPath
-                    @@podspec = @@linter.spec
-                when "git"
+                    @@name = @@linter.spec.name
+                when "version"
+                    @@linter = scan_pod @projectPath
+                    @@version = @@linter.spec.version
+                when "remote"
                     @@git = scan_git @projectPath
+                    @@remote = @@git.remote
+                when "branch"
+                    @@git = scan_git @projectPath
+                    @@branch = @@git.branches.current.first
                 when "workspace"
                     @@workspace = scan_workspace @projectPath
                 else
@@ -48,12 +60,24 @@ module PPL
             @@linter
         end
 
-        def self.podspec
-            @@podspec
+        def self.name
+            @@name
+        end
+
+        def self.version
+            @@version
         end
 
         def self.git
             @@git
+        end
+
+        def self.remote
+            @@remote
+        end
+
+        def self.branch
+            @@branch
         end
 
         def self.workspace
