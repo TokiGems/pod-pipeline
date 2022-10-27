@@ -123,8 +123,8 @@ module PPL
                 binary = "#{@framework_path}/#{@podspec.name}"
                 #添加 构建生成的二进制文件
                 inputs = []
-                inputs << "#{@build_path}/**/lib#{@podspec.name}.a"
-                inputs << "#{@build_path}/**/*.framework/#{@podspec.name}"
+                inputs << "#{@build_path}/*/**/lib#{@podspec.name}.a"
+                inputs << "#{@build_path}/*/**/*.framework/#{@podspec.name}"
                 if local_dependency
                     #添加 本地依赖的二进制文件
                     inputs << "#{@output}/#{@podspec.name}/Libraries/**/*.a" 
@@ -132,8 +132,8 @@ module PPL
                 end
                 if pod_dependency
                     #添加 Pod依赖库构建生成的二进制文件
-                    inputs << "#{@build_path}/**/lib*.a";
-                    inputs << "#{@build_path}/**/*.framework/*";
+                    inputs << "#{@build_path}/*/**/lib*.a";
+                    inputs << "#{@build_path}/*/**/*.framework/*";
                     #添加 Pod依赖库预先构建的二进制文件
                     inputs << "#{@output}/Example/Pods/**/*SDK/*.framework/*"
                     #添加 Pod依赖库本地依赖的二进制文件
@@ -155,7 +155,7 @@ module PPL
                 end
                 if pod_dependency
                     #添加 Pod依赖库构建生成的资源包
-                    inputs << "#{@build_path}/**/*.bundle"
+                    inputs << "#{@build_path}/*/**/*.bundle"
                     #添加 Pod依赖库预先构建的资源包
                     inputs << "#{@output}/Example/Pods/**/*SDK/*.bundle"
                     #添加 Pod依赖库本地依赖的资源包
