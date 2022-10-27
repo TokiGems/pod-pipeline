@@ -50,7 +50,7 @@ module PPL
             def run
                 PPL::Command::Update.run([@projectPath] + argv_extension['update'])
 
-                PPL::Scanner.new(@projectPath, ['pod']).run
+                PPL::Scanner.new(@projectPath, ['all']).run
                 
                 podspec_file = PPL::Scanner.linter.file
                 

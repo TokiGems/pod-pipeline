@@ -42,7 +42,7 @@ module PPL
             end
 
             def run
-                PPL::Scanner.new(@projectPath, ['pod', 'git']).run
+                PPL::Scanner.new(@projectPath, ['all']).run
 
                 @channels = ["all"] if @channels.count.zero?
             
@@ -64,7 +64,7 @@ module PPL
             end
 
             def update_version
-                version = PPL::Scanner.podspec.version
+                version = PPL::Scanner.linter.spec.version
                 raise "版本号异常，无法更新" unless version
                 if @new_version
                     version.archiving(@new_version)
@@ -77,7 +77,7 @@ module PPL
 
             def update_git
                 git = PPL::Scanner.git
-                new_tag = PPL::Scanner.podspec.version.version
+                new_tag = PPL::Scanner.linter.spec.version.version
                 git.tags.each do |tag|
                     raise "当前版本 #{new_tag} 已发布，请尝试其他版本号" if tag.name.eql? new_tag
                 end
