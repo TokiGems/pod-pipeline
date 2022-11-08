@@ -22,7 +22,8 @@ module PPL
                     ['--output=./', '项目构建的输出目录。(默认使用项目根目录)'],
                     ['--configuration=Release', '项目构建的环境。(默认为Release)'],
                     ['--arch=arm64,armv7,x86_64', '项目构建的架构。(默认为 arm64,armv7,x86_64)'],
-                    ['--combine=local,pod', '项目构建后合并依赖库的二进制文件，local为本地依赖库，pod为CocoaPods依赖库。(默认为 local)'],
+                    ['--combine=local,pod', '项目构建后合并依赖库的二进制文件，local为本地依赖库，pod为CocoaPods依赖库。(默认为 不合并)'],
+                    ['--combine-ignore=name1,name2', '项目构建后合并依赖库的二进制文件，标注不想合并的内容。'],
                     ['--bundle-merge=merge', '是否合并所有资源包，参数为合并后的资源包名。(默认为 不合并)'],
                 ].concat(super)
             end
@@ -33,6 +34,7 @@ module PPL
                 @configuration      = argv.option('configuration', '').split(',').first
                 @archs              = argv.option('arch', '').split(',')
                 @combines           = argv.option('combine', '').split(',')
+                @combine_ignore     = argv.option('combine-ignore', '').split(',')
                 @bundle_merge       = argv.option('bundle-merge', '').split(',').first
                 
                 @projectPath = @path.count.zero? ? Pathname.pwd.to_s : @path.first
@@ -141,7 +143,7 @@ module PPL
                     inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.framework/*"
                 end
     
-                Binary.combine(binary, inputs)
+                Binary.combine(binary, inputs, @combine_ignore)
                 Binary.thin(binary, @archs)
             end
             
@@ -163,7 +165,7 @@ module PPL
                     inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.bundle"
                 end
     
-                Bundle.cp(inputs, @build_path)
+                Bundle.cp(inputs, @build_path, @combine_ignore)
             end
 
             def merge_bundles
