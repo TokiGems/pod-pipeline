@@ -149,7 +149,7 @@ module PPL
             
             def copy_bundles(local_dependency, pod_dependency)
                 #添加 构建生成的资源包
-                inputs = ["#{@output}/**/#{@podspec.name}/*.bundle"]
+                inputs = ["#{@build_path}/**/#{@podspec.name}/*.bundle"]
                 if local_dependency
                     #添加 本地依赖的资源包
                     inputs << "#{@output}/#{@podspec.name}/Libraries/**/*.bundle" 
