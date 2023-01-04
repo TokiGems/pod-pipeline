@@ -1,6 +1,6 @@
 module PPL
     class Binary
-        def self.combine(output, inputs, ignore_list=[])
+        def self.combine(output, inputs, exclude_list=[])
             puts "\n目标文件：#{output}\n"
 
             #获取合并文件的路径序列
@@ -16,16 +16,16 @@ module PPL
                     echo result:$?`
                     next unless info_log.include? 'result:0'
                     #若 input_file 为被忽略标记的文件 则跳过
-                    is_ignore = false
-                    ignore_list.each { |ignore|
+                    is_exclude = false
+                    exclude_list.each { |exclude|
                         input_file_basename = File.basename(input_file)
-                        ignore_basename = File.basename(ignore)
-                        if input_file_basename == ignore_basename || input_file_basename == "lib#{ignore_basename}.a"
-                            is_ignore = true
+                        exclude_basename = File.basename(exclude)
+                        if input_file_basename == exclude_basename || input_file_basename == "lib#{exclude_basename}.a"
+                            is_exclude = true
                             break
                         end
                     }
-                    next if is_ignore
+                    next if is_exclude
                     #若 input_file 为序列中已存在的文件 则跳过
                     next if input_file_queue.include? input_file
 
