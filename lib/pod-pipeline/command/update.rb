@@ -66,12 +66,8 @@ module PPL
             def update_version
                 version = PPL::Scanner.linter.spec.version
                 raise "版本号异常，无法更新" unless version
-                if @new_version
-                    version.archiving(@new_version)
-                else
-                    version.increase_patch 
-                end
-
+                
+                version.increase(@new_version)
                 PPL::Scanner.linter.write_to_file('version', version.version)
             end
 
