@@ -16,27 +16,31 @@ module PPL
                     echo result:$?`
                     next unless info_log.include? 'result:0'
                     #若 input_file 非被include标记的文件 则跳过
-                    is_include = false
-                    include_list.each { |include|
-                        input_file_basename = File.basename(input_file)
-                        include_basename = File.basename(include)
-                        if input_file_basename == include_basename || input_file_basename == "lib#{include_basename}.a"
-                            is_include = true
-                            break
-                        end
-                    }
-                    next unless is_include
+                    unless include_list.empty?
+                        is_include = false
+                        include_list.each { |include|
+                            input_file_basename = File.basename(input_file)
+                            include_basename = File.basename(include)
+                            if input_file_basename == include_basename || input_file_basename == "lib#{include_basename}.a"
+                                is_include = true
+                                break
+                            end
+                        }
+                        next unless is_include
+                    end
                     #若 input_file 为被exclude标记的文件 则跳过
-                    is_exclude = false
-                    exclude_list.each { |exclude|
-                        input_file_basename = File.basename(input_file)
-                        exclude_basename = File.basename(exclude)
-                        if input_file_basename == exclude_basename || input_file_basename == "lib#{exclude_basename}.a"
-                            is_exclude = true
-                            break
-                        end
-                    }
-                    next if is_exclude
+                    unless exclude_list.empty?
+                        is_exclude = false
+                        exclude_list.each { |exclude|
+                            input_file_basename = File.basename(input_file)
+                            exclude_basename = File.basename(exclude)
+                            if input_file_basename == exclude_basename || input_file_basename == "lib#{exclude_basename}.a"
+                                is_exclude = true
+                                break
+                            end
+                        }
+                        next if is_exclude
+                    end
                     #若 input_file 为序列中已存在的文件 则跳过
                     next if input_file_queue.include? input_file
 
