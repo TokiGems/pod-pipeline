@@ -1,6 +1,6 @@
 module PPL
     class Binary
-        def self.combine(output, inputs, exclude_list=[])
+        def self.combine(output, inputs, include_list=[], exclude_list=[])
             puts "\n目标文件：#{output}\n"
 
             #获取合并文件的路径序列
@@ -15,7 +15,18 @@ module PPL
                     info_log = `lipo -info "#{input_file}" > /dev/null 2>&1
                     echo result:$?`
                     next unless info_log.include? 'result:0'
-                    #若 input_file 为被忽略标记的文件 则跳过
+                    #若 input_file 非被include标记的文件 则跳过
+                    is_include = false
+                    include_list.each { |include|
+                        input_file_basename = File.basename(input_file)
+                        include_basename = File.basename(include)
+                        if input_file_basename == include_basename || input_file_basename == "lib#{include_basename}.a"
+                            is_include = true
+                            break
+                        end
+                    }
+                    next unless is_include
+                    #若 input_file 为被exclude标记的文件 则跳过
                     is_exclude = false
                     exclude_list.each { |exclude|
                         input_file_basename = File.basename(input_file)
