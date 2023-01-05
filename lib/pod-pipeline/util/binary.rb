@@ -81,7 +81,7 @@ module PPL
                     return 
                 end
             end
-            File.delete(binary)
+            File.delete(binary) if File.exist? binary
 
             binary_pieces = "#{binary}-*"
             combine(binary, [binary_pieces])

@@ -1,6 +1,6 @@
 module PPL
     class Bundle
-        def self.cp(inputs, output, include_list=[], exclude_list=[])
+        def self.combine(inputs, output, include_list=[], exclude_list=[])
             puts "\n目标文件：#{output}\n"
 
             #获取合并文件的路径序列

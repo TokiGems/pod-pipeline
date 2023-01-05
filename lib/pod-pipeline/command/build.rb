@@ -4,6 +4,7 @@ require 'pod-pipeline/util/scanner'
 require 'pod-pipeline/util/xcodebuild'
 require 'pod-pipeline/util/binary'
 require 'pod-pipeline/util/bundle'
+require 'pod-pipeline/util/header'
 
 require 'pod-pipeline/extension/dir-ppl'
 
@@ -23,6 +24,7 @@ module PPL
                     ['--configuration=Release', '项目构建的环境。(默认为Release)'],
                     ['--arch=arm64,armv7,x86_64', '项目构建的架构。(默认为 arm64,armv7,x86_64)'],
                     ['--combine=local,pod', '项目构建后合并依赖库的二进制文件，local为本地依赖库，pod为CocoaPods依赖库。(默认为 不合并)'],
+                    ['--combine-headers=false', '项目构建后合并依赖库的头文件。(默认为 不合并)'],
                     ['--combine-include=name1,name2', '项目构建后合并依赖库的二进制文件，标注想合并的内容，执行顺序在exclude前。'],
                     ['--combine-exclude=name1,name2', '项目构建后合并依赖库的二进制文件，标注不想合并的内容，执行顺序在include后。'],
                     ['--bundle-merge=merge', '是否合并所有资源包，参数为合并后的资源包名。(默认为 不合并)'],
@@ -35,8 +37,9 @@ module PPL
                 @configuration      = argv.option('configuration', '').split(',').first
                 @archs              = argv.option('arch', '').split(',')
                 @combines           = argv.option('combine', '').split(',')
-                @combine_include     = argv.option('combine-include', '').split(',')
-                @combine_exclude     = argv.option('combine-exclude', '').split(',')
+                @combine_headers    = argv.option('combine-headers', false)
+                @combine_include    = argv.option('combine-include', '').split(',')
+                @combine_exclude    = argv.option('combine-exclude', '').split(',')
                 @bundle_merge       = argv.option('bundle-merge', '').split(',').first
                 
                 @projectPath = @path.count.zero? ? Pathname.pwd.to_s : @path.first
@@ -67,9 +70,9 @@ module PPL
                     XCodebuild.build(@workspace.path, @podspec.name, arch, @configuration, @build_path)
                 end
 
-                #添加头文件
-                puts "\n[添加Framework头文件]"
-                add_headers
+                #合并头文件
+                puts "\n[合并 #{@combines.join(", ")} 的头文件]"
+                combine_headers(@combines.include?('local'), @combines.include?('pod'))
 
                 #合并二进制文件
                 puts "\n[合并 #{@combines.join(", ")} 的二进制文件]"
@@ -98,31 +101,50 @@ module PPL
             end
     
             def add_headers
-                header_stands = "#{@output}/Example/Pods/Headers/Public/#{@podspec.name}/*.h"
-                Dir[header_stands].each do |header_stand|
-                    if File.ftype(header_stand).eql? 'link'
-                        header_file = "#{File.dirname(header_stand)}/#{File.readlink(header_stand)}"
-                        if File.ftype(header_file).eql? 'file'
-                            header_file_basename = File.basename(header_file)
-                            if !(File.exist? "#{@framework_headers_path}/#{header_file_basename}")
-                                puts header_file_basename
-                                FileUtils.cp(header_file, @framework_headers_path)
-                            end
-                        end
-                    end
-                end
-                header_files = "#{@build_path}/**/#{@podspec.name}.framework/Headers/*.h"
-                Dir[header_files].each do |header_file|
-                    if File.ftype(header_file).eql? 'file'
-                        header_file_basename = File.basename(header_file)
-                        if !(File.exist? "#{@framework_headers_path}/#{header_file_basename}")
-                            puts header_file_basename
-                            FileUtils.cp(header_file, @framework_headers_path)
-                        end
-                    end
-                end
+                # header_stands = "#{@output}/Example/Pods/Headers/Public/#{@podspec.name}/*.h"
+                # Dir[header_stands].each do |header_stand|
+                #     if File.ftype(header_stand).eql? 'link'
+                #         header_file = "#{File.dirname(header_stand)}/#{File.readlink(header_stand)}"
+                #         if File.ftype(header_file).eql? 'file'
+                #             header_file_basename = File.basename(header_file)
+                #             if !(File.exist? "#{@framework_headers_path}/#{header_file_basename}")
+                #                 puts header_file_basename
+                #                 FileUtils.cp(header_file, @framework_headers_path)
+                #             end
+                #         end
+                #     end
+                # end
+                # header_files = "#{@build_path}/**/#{@podspec.name}.framework/Headers/*.h"
+                # Dir[header_files].each do |header_file|
+                #     if File.ftype(header_file).eql? 'file'
+                #         header_file_basename = File.basename(header_file)
+                #         if !(File.exist? "#{@framework_headers_path}/#{header_file_basename}")
+                #             puts header_file_basename
+                #             FileUtils.cp(header_file, @framework_headers_path)
+                #         end
+                #     end
+                # end
             end
     
+            def combine_headers(local_dependency, pod_dependency)
+                headers = "#{@framework_path}/Headers"
+                #添加 构建生成的二进制文件
+                inputs = []
+                inputs << "#{@build_path}/*/**/#{@podspec.name}.framework"
+                if local_dependency
+                    #添加 本地依赖的二进制文件
+                    inputs << "#{@output}/#{@podspec.name}/Frameworks/**/*.framework"
+                end
+                if pod_dependency
+                    #添加 Pod依赖库构建生成的二进制文件
+                    inputs << "#{@build_path}/*/**/*.framework"
+                    #添加 Pod依赖库本地依赖的二进制文件
+                    inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.framework"
+                end
+    
+                Header.combine(headers, inputs, @combine_include, @combine_exclude)
+            end
+
             def combine_binarys(local_dependency, pod_dependency)
                 binary = "#{@framework_path}/#{@podspec.name}"
                 #添加 构建生成的二进制文件
@@ -136,8 +158,8 @@ module PPL
                 end
                 if pod_dependency
                     #添加 Pod依赖库构建生成的二进制文件
-                    inputs << "#{@build_path}/*/**/lib*.a";
-                    inputs << "#{@build_path}/*/**/*.framework/*";
+                    inputs << "#{@build_path}/*/**/lib*.a"
+                    inputs << "#{@build_path}/*/**/*.framework/*"
                     #添加 Pod依赖库预先构建的二进制文件
                     inputs << "#{@output}/Example/Pods/**/*SDK/*.framework/*"
                     #添加 Pod依赖库本地依赖的二进制文件
@@ -167,7 +189,7 @@ module PPL
                     inputs << "#{@output}/Example/Pods/**/Frameworks/**/*.bundle"
                 end
     
-                Bundle.cp(inputs, @build_path, @combine_include, @combine_exclude)
+                Bundle.combine(inputs, @build_path, @combine_include, @combine_exclude)
             end
 
             def merge_bundles
