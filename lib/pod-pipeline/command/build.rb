@@ -101,36 +101,35 @@ module PPL
             end
     
             def add_headers
-                # header_stands = "#{@output}/Example/Pods/Headers/Public/#{@podspec.name}/*.h"
-                # Dir[header_stands].each do |header_stand|
-                #     if File.ftype(header_stand).eql? 'link'
-                #         header_file = "#{File.dirname(header_stand)}/#{File.readlink(header_stand)}"
-                #         if File.ftype(header_file).eql? 'file'
-                #             header_file_basename = File.basename(header_file)
-                #             if !(File.exist? "#{@framework_headers_path}/#{header_file_basename}")
-                #                 puts header_file_basename
-                #                 FileUtils.cp(header_file, @framework_headers_path)
-                #             end
-                #         end
-                #     end
-                # end
-                # header_files = "#{@build_path}/**/#{@podspec.name}.framework/Headers/*.h"
-                # Dir[header_files].each do |header_file|
-                #     if File.ftype(header_file).eql? 'file'
-                #         header_file_basename = File.basename(header_file)
-                #         if !(File.exist? "#{@framework_headers_path}/#{header_file_basename}")
-                #             puts header_file_basename
-                #             FileUtils.cp(header_file, @framework_headers_path)
-                #         end
-                #     end
-                # end
+                header_stands = "#{@output}/Example/Pods/Headers/Public/#{@podspec.name}/*.h"
+                Dir[header_stands].each do |header_stand|
+                    if File.ftype(header_stand).eql? 'link'
+                        header_file = "#{File.dirname(header_stand)}/#{File.readlink(header_stand)}"
+                        if File.ftype(header_file).eql? 'file'
+                            header_file_basename = File.basename(header_file)
+                            if !(File.exist? "#{@framework_headers_path}/#{header_file_basename}")
+                                puts header_file_basename
+                                FileUtils.cp(header_file, @framework_headers_path)
+                            end
+                        end
+                    end
+                end
+                header_files = "#{@build_path}/**/#{@podspec.name}.framework/Headers/*.h"
+                Dir[header_files].each do |header_file|
+                    if File.ftype(header_file).eql? 'file'
+                        header_file_basename = File.basename(header_file)
+                        if !(File.exist? "#{@framework_headers_path}/#{header_file_basename}")
+                            puts header_file_basename
+                            FileUtils.cp(header_file, @framework_headers_path)
+                        end
+                    end
+                end
             end
     
             def combine_headers(local_dependency, pod_dependency)
                 headers = "#{@framework_path}/Headers"
                 #添加 构建生成的二进制文件
                 inputs = []
-                inputs << "#{@build_path}/*/**/#{@podspec.name}.framework"
                 if local_dependency
                     #添加 本地依赖的二进制文件
                     inputs << "#{@output}/#{@podspec.name}/Frameworks/**/*.framework"
@@ -143,6 +142,8 @@ module PPL
                 end
     
                 Header.combine(headers, inputs, @combine_include, @combine_exclude)
+
+                add_headers
             end
 
             def combine_binarys(local_dependency, pod_dependency)
