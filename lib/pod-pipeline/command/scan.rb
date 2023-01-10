@@ -1,5 +1,6 @@
 require 'pod-pipeline/command/scan/name'
 require 'pod-pipeline/command/scan/version'
+require 'pod-pipeline/command/scan/depend'
 require 'pod-pipeline/command/scan/remote'
 require 'pod-pipeline/command/scan/branch'
 require 'pod-pipeline/command/scan/workspace'

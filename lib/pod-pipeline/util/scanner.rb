@@ -10,6 +10,7 @@ module PPL
         @@linter = nil
         @@name = nil
         @@version = nil
+        @@depend = nil
         @@git = nil
         @@remote = nil
         @@branch = nil
@@ -30,6 +31,7 @@ module PPL
                     @@linter = scan_pod @projectPath
                     @@name = @@linter.spec.name
                     @@version = @@linter.spec.version
+                    @@depend = @@linter.spec.dependencies
                     @@git = scan_git @projectPath
                     @@remote = @@git.remote
                     @@branch = @@git.branches.current.first
@@ -40,6 +42,9 @@ module PPL
                 when "version"
                     @@linter = scan_pod @projectPath
                     @@version = @@linter.spec.version
+                when "depend"
+                    @@linter = scan_pod @projectPath
+                    @@depend = @@linter.spec.dependencies.map{ |depend| depend.name }.join(',')
                 when "remote"
                     @@git = scan_git @projectPath
                     @@remote = @@git.remote
@@ -66,6 +71,10 @@ module PPL
 
         def self.version
             @@version
+        end
+
+        def self.depend
+            @@depend
         end
 
         def self.git
