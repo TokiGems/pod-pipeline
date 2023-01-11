@@ -45,6 +45,15 @@ module PPL
       input_queue
     end
 
+    def self.combine_reset(header, include_list)
+      content = File.read(header)
+      replace = PPL::Scanner.name
+      include_list.each do |include_name|
+        content = content.gsub(include_name, replace)
+      end
+      File.write(header, content)
+    end
+
     def self.combine(output, inputs, include_list = [], exclude_list = [])
       puts "\n目标文件：#{output}\n"
 
@@ -52,6 +61,9 @@ module PPL
         Dir["#{input}/Headers/*.h"].each do |header|
           FileUtils.cp(header, output, 'preserve': true)
         end
+      end
+      Dir["#{output}/*.h"].each do |header|
+        combine_reset(header, include_list)
       end
     end
   end

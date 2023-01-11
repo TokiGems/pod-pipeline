@@ -70,9 +70,11 @@ module PPL
                     XCodebuild.build(@workspace.path, @podspec.name, arch, @configuration, @build_path)
                 end
 
-                #合并头文件
-                puts "\n[合并 #{@combines.join(", ")} 的头文件]"
-                combine_headers(@combines.include?('local'), @combines.include?('pod'))
+                if @combine_headers
+                    #合并头文件
+                    puts "\n[合并 #{@combines.join(", ")} 的头文件]"
+                    combine_headers(@combines.include?('local'), @combines.include?('pod'))
+                end
 
                 #合并二进制文件
                 puts "\n[合并 #{@combines.join(", ")} 的二进制文件]"
