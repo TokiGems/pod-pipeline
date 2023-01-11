@@ -54,6 +54,19 @@ module PPL
       File.write(header, content)
     end
 
+    def self.combine_base(output)
+      base_name = PPL::Scanner.name
+      base_header = "#{output}/#{base_name}.h"
+      base_macro = "#{base_name.upcase}_HEADER"
+      base_content = []
+      base_file = File.open(base_header, 'w')
+      base_content << "#ifndef #{base_macro}"
+      base_content << "#define #{base_macro}"
+      Dir["#{output}/*.h"].each { |header| base_content << "#import <#{base_name}/#{File.basename(header)}>" }
+      base_content << "#endif //#{base_macro}"
+      base_content.each { |base_line| base_file.puts(base_line) }
+    end
+
     def self.combine(output, inputs, include_list = [], exclude_list = [])
       puts "\n目标文件：#{output}\n"
 
@@ -65,6 +78,7 @@ module PPL
       Dir["#{output}/*.h"].each do |header|
         combine_reset(header, include_list)
       end
+      combine_base(output)
     end
   end
 end
