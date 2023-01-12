@@ -45,11 +45,13 @@ module PPL
       input_queue
     end
 
-    def self.combine_reset(header, include_list)
+    def self.combine_reset(header, inputs)
       content = File.read(header)
       replace = PPL::Scanner.name
-      include_list.each do |include_name|
-        content = content.gsub(include_name, replace)
+      inputs.each do |input|
+        Dir[input].each do |input_path|
+          content = content.gsub("#import <#{File.basename(input_path, '.framework')}", "#import <#{replace}")
+        end
       end
       File.write(header, content)
     end
@@ -72,12 +74,12 @@ module PPL
 
       combine_collect(inputs, include_list, exclude_list).each do |input|
         Dir["#{input}/Headers/*.h"].each do |header|
+          next if header.include?('-umbrella.h')
+
           FileUtils.cp(header, output, 'preserve': true)
         end
       end
-      Dir["#{output}/*.h"].each do |header|
-        combine_reset(header, include_list)
-      end
+      Dir["#{output}/*.h"].each { |header| combine_reset(header, inputs) }
       combine_base(output)
     end
   end
