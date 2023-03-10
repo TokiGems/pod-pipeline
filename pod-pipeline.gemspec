@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
     s.executables = ["ppl"]
 
     s.add_runtime_dependency 'cocoapods-core',       "= #{Pod::VERSION}"     # CocoaPods核心代码，对应本地版本号
-    s.add_runtime_dependency 'cocoapods-trunk',       '>= 1.4.0', '< 2.0'
+    s.add_runtime_dependency 'cocoapods-trunk',       '>= 1.5.0', '< 2.0'
     
     s.add_runtime_dependency 'git',                  '>= 1.8.1', '< 2.0'     # Git项目管理工具
     s.add_runtime_dependency 'xcodeproj',            '>= 1.19.0', '< 2.0'    # Cocoapods团队的xcode项目管理工具
