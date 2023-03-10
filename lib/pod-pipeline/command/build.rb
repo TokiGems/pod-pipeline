@@ -76,6 +76,9 @@ module PPL
                     combine_headers(@combines.include?('local'), @combines.include?('pod'))
                 end
 
+                #合并本地头文件
+                add_headers
+
                 #合并二进制文件
                 puts "\n[合并 #{@combines.join(", ")} 的二进制文件]"
                 combine_binarys(@combines.include?('local'), @combines.include?('pod'))
@@ -103,7 +106,9 @@ module PPL
             end
     
             def add_headers
+                puts "\n[合并 本地的头文件]"
                 header_stands = "#{@output}/Example/Pods/Headers/Public/#{@podspec.name}/*.h"
+                puts "\n合并路径：#{header_stands}"
                 Dir[header_stands].each do |header_stand|
                     if File.ftype(header_stand).eql? 'link'
                         header_file = "#{File.dirname(header_stand)}/#{File.readlink(header_stand)}"
@@ -116,7 +121,8 @@ module PPL
                         end
                     end
                 end
-                header_files = "#{@build_path}/**/#{@podspec.name}.framework/Headers/*.h"
+                header_files = "#{@build_path}/**/#{@podspec.name}/#{@podspec.name}.framework/Headers/*.h"
+                puts "\n合并路径：#{header_files}"
                 Dir[header_files].each do |header_file|
                     if File.ftype(header_file).eql? 'file'
                         header_file_basename = File.basename(header_file)
@@ -144,8 +150,6 @@ module PPL
                 end
     
                 Header.combine(headers, inputs, @combine_include, @combine_exclude)
-
-                add_headers
             end
 
             def combine_binarys(local_dependency, pod_dependency)
