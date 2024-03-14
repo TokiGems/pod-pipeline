@@ -3,7 +3,7 @@ require 'cocoapods'
 
 Gem::Specification.new do |s|
     s.name        = 'pod-pipeline'
-    s.version     = '0.5.10'
+    s.version     = '0.5.11'
     s.summary     = "Cocoapods流水线工具"
     s.description = "为组件化开发设计的集项目构建、发布为一体的强大工具"
     s.authors     = ["郑贤达"]
@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
 
     s.executables = ["ppl"]
 
-    s.add_runtime_dependency 'cocoapods-core',       "= #{Pod::VERSION}"     # CocoaPods核心代码，对应本地版本号
-    s.add_runtime_dependency 'cocoapods-trunk',       '>= 1.5.0', '< 2.0'
+    s.add_runtime_dependency 'cocoapods-core',       '>= 1.11.0'             # CocoaPods核心代码，对应本地版本号
+    s.add_runtime_dependency 'cocoapods-trunk',      '>= 1.5.0', '< 2.0'
     
     s.add_runtime_dependency 'git',                  '>= 1.8.1', '< 2.0'     # Git项目管理工具
     s.add_runtime_dependency 'xcodeproj',            '>= 1.19.0', '< 2.0'    # Cocoapods团队的xcode项目管理工具
